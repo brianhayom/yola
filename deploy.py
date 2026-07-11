@@ -93,9 +93,9 @@ REDIS_URL=redis://redis:6379
     # Step 8: Run Prisma db push inside backend container (npx not available in Alpine, use node path)
     run_command(client, "docker exec yola-backend node node_modules/.bin/prisma db push --accept-data-loss 2>&1 || docker exec yola-backend node node_modules/prisma/build/index.js db push --accept-data-loss 2>&1 || echo 'prisma push skipped (will retry on next deploy)'", "Running Prisma db push...")
 
-    # Step 9: Configure Nginx reverse proxy (use port 8080 to avoid conflict with loan-dashboard on port 80)
+    # Step 9: Configure Nginx reverse proxy (use port 88 to avoid conflict with loan-dashboard on port 80)
     nginx_config = """server {
-    listen 8080;
+    listen 88;
     server_name 51.79.150.44;
 
     # Frontend
@@ -142,7 +142,7 @@ REDIS_URL=redis://redis:6379
     print("="*60)
     print(f"Frontend: http://{HOST}:3000")
     print(f"Backend API: http://{HOST}:4000/api")
-    print(f"Nginx (if running): http://{HOST}:8080")
+    print(f"Nginx (if running): http://{HOST}:88")
     print(f"GitHub: https://github.com/brianhayom/yola")
     print("="*60)
 
