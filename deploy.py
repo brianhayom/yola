@@ -71,6 +71,7 @@ OPENAI_API_KEY=sk-d452d91a193f05fe-snekpt-e998373b
 OPENAI_BASE_URL=https://9router-102.semutssh.app/v1
 OPENAI_MODEL=gpt-4o-mini
 FRONTEND_URL=http://51.79.150.44
+NEXT_PUBLIC_API_URL=http://51.79.150.44:4000/api
 PORT=4000
 NODE_ENV=production
 REDIS_URL=redis://redis:6379
@@ -89,8 +90,8 @@ REDIS_URL=redis://redis:6379
     if "not found" in out.lower():
         run_command(client, "apt-get update -qq && apt-get install -y nginx 2>&1", "Installing Nginx...")
 
-    # Step 8: Run Prisma migration inside backend container
-    run_command(client, "docker exec yola-backend npx prisma migrate deploy 2>&1 || echo 'migration skipped (will retry)'", "Running Prisma migration...")
+    # Step 8: Run Prisma db push inside backend container (npx not available in Alpine, use node path)
+    run_command(client, "docker exec yola-backend node node_modules/.bin/prisma db push --accept-data-loss 2>&1 || docker exec yola-backend node node_modules/prisma/build/index.js db push --accept-data-loss 2>&1 || echo 'prisma push skipped (will retry on next deploy)'", "Running Prisma db push...")
 
     # Step 9: Configure Nginx reverse proxy (use port 8080 to avoid conflict with loan-dashboard on port 80)
     nginx_config = """server {

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
-import { HiEye, HiEyeSlash, HiHeart } from 'react-icons/hi2';
+import { HiEye, HiEyeSlash, HiSparkles } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
@@ -51,7 +51,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col justify-center px-4">
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-xl shadow-primary-500/30 mb-4">
-          <HiHeart className="w-10 h-10 text-white" />
+          <HiSparkles className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 font-display">Buat Akun</h1>
         <p className="text-gray-500 mt-2">Mulai planning hidupmu dengan YOLA</p>

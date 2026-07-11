@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { HiHome, HiHeart, HiGlobeAlt, HiUser, HiSparkles } from 'react-icons/hi2';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: HiHome },
+  { href: '/dashboard', label: 'Home', icon: HiHome },
   { href: '/wedding', label: 'Wedding', icon: HiHeart },
   { href: '/trip', label: 'Trip', icon: HiGlobeAlt },
   { href: '/baby', label: 'Baby', icon: HiSparkles },

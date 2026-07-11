@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/providers';
-import { BottomNav } from '@/components/layout/BottomNav';
+import { BottomNavWrapper } from '@/components/layout/BottomNavWrapper';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
@@ -48,7 +48,7 @@ export default function RootLayout({
           <main className="pb-20 safe-bottom">
             {children}
           </main>
-          <BottomNav />
+          <BottomNavWrapper />
           <Toaster
             position="top-center"
             toastOptions={{
