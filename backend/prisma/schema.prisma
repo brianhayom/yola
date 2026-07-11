@@ -1,0 +1,673 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────
+// AUTH & USER
+// ─────────────────────────────────────
+
+enum UserPlan {
+  FREE
+  PREMIUM
+  FAMILY
+}
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  passwordHash  String?
+  name          String
+  phone         String?
+  avatarUrl     String?
+  plan          UserPlan   @default(FREE)
+  googleId      String?    @unique
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  profile       UserProfile?
+  weddings      Wedding[]
+  trips         Trip[]
+  babyPlans     BabyPlan[]
+  notifications Notification[]
+  reminders     Reminder[]
+  subscription  Subscription?
+  auditLogs     AuditLog[]
+  waConversations WaConversation[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partnerName String?
+  weddingDate DateTime?
+  preferences Json?    // JSON: { currency, language, theme, etc }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+model Subscription {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan        UserPlan  @default(FREE)
+  status      String    @default("active") // active, cancelled, expired
+  startDate   DateTime  @default(now())
+  expiryDate  DateTime?
+  paymentRef  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("subscriptions")
+}
+
+// ─────────────────────────────────────
+// WEDDING MODULE
+// ─────────────────────────────────────
+
+enum VendorStatus {
+  PROSPECTING
+  CONTACTED
+  QUOTED
+  NEGOTIATING
+  BOOKED
+  PAID
+  DONE
+  CANCELLED
+}
+
+enum WeddingVendorCategory {
+  VENUE
+  CATERING
+  PHOTO_VIDEO
+  MAKEUP_HAIR
+  DECORATION
+  ENTERTAINMENT_MC
+  WEDDING_ORGANIZER
+  INVITATION
+  SOUVENIR
+  TRANSPORT
+  SECURITY
+  OTHER
+}
+
+model Wedding {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String   @default("My Wedding")
+  budgetTotal Decimal? @db.Decimal(15, 2)
+  guestCount  Int?
+  date        DateTime?
+  venue       String?
+  status      String   @default("planning") // planning, in_progress, completed
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  checklists  WeddingChecklist[]
+  vendors     WeddingVendor[]
+  budgets     WeddingBudget[]
+  guests      WeddingGuest[]
+  timelines   WeddingTimeline[]
+  documents   WeddingDocument[]
+
+  @@map("weddings")
+}
+
+model WeddingChecklist {
+  id          String   @id @default(uuid())
+  weddingId   String
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  category    String   // 12_6_months, 6_3_months, 3_1_month, 1_month_1_week, d_day
+  title       String
+  description String?
+  dueDate     DateTime?
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  priority    String   @default("medium") // low, medium, high, urgent
+  dependsOn   String?  // ID of dependent task
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("wedding_checklists")
+}
+
+model WeddingVendor {
+  id          String                @id @default(uuid())
+  weddingId   String
+  wedding     Wedding               @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  category    WeddingVendorCategory
+  name        String
+  contactName String?
+  phone       String?
+  email       String?
+  website     String?
+  address     String?
+  rating      Int?                  // 1-5
+  priceRange  String?               // e.g. "5jt-10jt"
+  notes       String?
+  status      VendorStatus          @default(PROSPECTING)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  quotes      WeddingVendorQuote[]
+  waConversations WaConversation[]
+
+  @@map("wedding_vendors")
+}
+
+model WeddingVendorQuote {
+  id          String   @id @default(uuid())
+  vendorId    String
+  vendor      WeddingVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  amount      Decimal? @db.Decimal(15, 2)
+  details     String?  // package details
+  fileUrl     String?  // uploaded quote document
+  receivedVia String   @default("manual") // manual, wa, email
+  status      String   @default("received") // received, accepted, rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("wedding_vendor_quotes")
+}
+
+model WeddingBudget {
+  id        String   @id @default(uuid())
+  weddingId String
+  wedding   Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  category  String   // venue, catering, photo_video, makeup, decoration, entertainment, wo, invitation, souvenir, transport, security, other
+  allocated Decimal  @default(0) @db.Decimal(15, 2)
+  spent     Decimal  @default(0) @db.Decimal(15, 2)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses  WeddingExpense[]
+
+  @@map("wedding_budgets")
+}
+
+model WeddingExpense {
+  id          String        @id @default(uuid())
+  budgetId    String
+  budget      WeddingBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  description String
+  amount      Decimal       @db.Decimal(15, 2)
+  date        DateTime      @default(now())
+  receiptUrl  String?
+  vendorName  String?
+  createdAt   DateTime      @default(now())
+
+  @@map("wedding_expenses")
+}
+
+model WeddingGuest {
+  id                String   @id @default(uuid())
+  weddingId         String
+  wedding           Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  name              String
+  contact           String?
+  group             String?  // keluarga_inti, teman_kantor, teman_kuliah, etc
+  rsvpStatus        String   @default("pending") // pending, attending, not_attending, maybe
+  tableAssignment   String?
+  dietaryRestrictions String?
+  plusOne           Boolean  @default(false)
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("wedding_guests")
+}
+
+model WeddingTimeline {
+  id          String   @id @default(uuid())
+  weddingId   String
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  time        DateTime
+  event       String   // akad, resepsi, foto_session, etc
+  description String?
+  location    String?
+  vendorId    String?  // responsible vendor
+  duration    Int?     // in minutes
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("wedding_timelines")
+}
+
+model WeddingDocument {
+  id          String   @id @default(uuid())
+  weddingId   String
+  wedding     Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  title       String
+  category    String   // contract, invoice, moodboard, other
+  fileUrl     String
+  fileType    String?
+  expiryDate  DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("wedding_documents")
+}
+
+// ─────────────────────────────────────
+// HOLIDAY / TRIP MODULE
+// ─────────────────────────────────────
+
+enum TripVendorCategory {
+  FLIGHT
+  HOTEL_AIRBNB
+  TOUR_OPERATOR
+  TRAVEL_INSURANCE
+  CAR_RENTAL
+  LOCAL_TRANSPORT
+  OTHER
+}
+
+model Trip {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String   @default("My Trip")
+  destination String?
+  startDate   DateTime?
+  endDate     DateTime?
+  budgetTotal Decimal? @db.Decimal(15, 2)
+  currency    String   @default("IDR")
+  status      String   @default("planning") // planning, booked, in_progress, completed
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  checklists  TripChecklist[]
+  vendors     TripVendor[]
+  budgets     TripBudget[]
+  itineraries TripItinerary[]
+  packingLists TripPackingList[]
+  documents   TripDocument[]
+
+  @@map("trips")
+}
+
+model TripChecklist {
+  id          String   @id @default(uuid())
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  category    String   // pre_trip, booking, documents, packing, other
+  title       String
+  description String?
+  dueDate     DateTime?
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  priority    String   @default("medium")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("trip_checklists")
+}
+
+model TripVendor {
+  id          String            @id @default(uuid())
+  tripId      String
+  trip        Trip              @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  category    TripVendorCategory
+  name        String
+  contactName String?
+  phone       String?
+  email       String?
+  website     String?
+  rating      Int?
+  priceRange  String?
+  notes       String?
+  status      VendorStatus      @default(PROSPECTING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  quotes      TripVendorQuote[]
+
+  @@map("trip_vendors")
+}
+
+model TripVendorQuote {
+  id          String      @id @default(uuid())
+  vendorId    String
+  vendor      TripVendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  amount      Decimal?    @db.Decimal(15, 2)
+  currency    String      @default("IDR")
+  details     String?
+  fileUrl     String?
+  receivedVia String      @default("manual")
+  status      String      @default("received")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("trip_vendor_quotes")
+}
+
+model TripBudget {
+  id        String   @id @default(uuid())
+  tripId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  category  String   // transport, accommodation, food, activities, shopping, misc
+  allocated Decimal  @default(0) @db.Decimal(15, 2)
+  spent     Decimal  @default(0) @db.Decimal(15, 2)
+  currency  String   @default("IDR")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses  TripExpense[]
+
+  @@map("trip_budgets")
+}
+
+model TripExpense {
+  id          String     @id @default(uuid())
+  budgetId    String
+  budget      TripBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  description String
+  amount      Decimal    @db.Decimal(15, 2)
+  currency    String     @default("IDR")
+  date        DateTime   @default(now())
+  receiptUrl  String?
+  vendorName  String?
+  createdAt   DateTime   @default(now())
+
+  @@map("trip_expenses")
+}
+
+model TripItinerary {
+  id          String   @id @default(uuid())
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  day         Int      // day 1, 2, 3...
+  date        DateTime?
+  time        String?  // "09:00"
+  activity    String
+  description String?
+  location    String?
+  duration    Int?     // in minutes
+  cost        Decimal? @db.Decimal(15, 2)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("trip_itineraries")
+}
+
+model TripPackingList {
+  id        String   @id @default(uuid())
+  tripId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  category  String   // clothing, toiletries, electronics, documents, medicine, misc
+  item      String
+  quantity  Int      @default(1)
+  packed    Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("trip_packing_lists")
+}
+
+model TripDocument {
+  id          String   @id @default(uuid())
+  tripId      String
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  title       String
+  category    String   // passport, visa, insurance, booking, other
+  fileUrl     String
+  fileType    String?
+  expiryDate  DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("trip_documents")
+}
+
+// ─────────────────────────────────────
+// BABY / CHILD MODULE
+// ─────────────────────────────────────
+
+enum BabyVendorCategory {
+  HOSPITAL_CLINIC
+  OBGYN_DOCTOR
+  PEDIATRICIAN
+  BABY_STORE
+  INSURANCE
+  NANNY_AGENCY
+  DAYCARE
+  OTHER
+}
+
+model BabyPlan {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String   @default("Baby Plan")
+  targetDate  DateTime?
+  budgetTotal Decimal? @db.Decimal(15, 2)
+  status      String   @default("planning") // planning, trying, pregnant, completed
+  trimester   String?  // pre_conception, first, second, third, newborn
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  checklists  BabyChecklist[]
+  vendors     BabyVendor[]
+  budgets     BabyBudget[]
+  milestones  BabyMilestone[]
+
+  @@map("baby_plans")
+}
+
+model BabyChecklist {
+  id          String   @id @default(uuid())
+  babyPlanId  String
+  babyPlan    BabyPlan @relation(fields: [babyPlanId], references: [id], onDelete: Cascade)
+  category    String   // medical, financial, nursery, gear, clothing, education, other
+  title       String
+  description String?
+  dueDate     DateTime?
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  priority    String   @default("medium")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("baby_checklists")
+}
+
+model BabyVendor {
+  id          String             @id @default(uuid())
+  babyPlanId  String
+  babyPlan    BabyPlan           @relation(fields: [babyPlanId], references: [id], onDelete: Cascade)
+  category    BabyVendorCategory
+  name        String
+  contactName String?
+  phone       String?
+  email       String?
+  website     String?
+  rating      Int?
+  priceRange  String?
+  notes       String?
+  status      VendorStatus       @default(PROSPECTING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  quotes      BabyVendorQuote[]
+
+  @@map("baby_vendors")
+}
+
+model BabyVendorQuote {
+  id          String      @id @default(uuid())
+  vendorId    String
+  vendor      BabyVendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  amount      Decimal?    @db.Decimal(15, 2)
+  details     String?
+  fileUrl     String?
+  receivedVia String      @default("manual")
+  status      String      @default("received")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("baby_vendor_quotes")
+}
+
+model BabyBudget {
+  id         String   @id @default(uuid())
+  babyPlanId String
+  babyPlan   BabyPlan @relation(fields: [babyPlanId], references: [id], onDelete: Cascade)
+  category   String   // medical, nursery, gear, clothing, diapers_formula, education_fund, insurance, nanny_daycare, other
+  allocated  Decimal  @default(0) @db.Decimal(15, 2)
+  spent      Decimal  @default(0) @db.Decimal(15, 2)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  expenses   BabyExpense[]
+
+  @@map("baby_budgets")
+}
+
+model BabyExpense {
+  id          String     @id @default(uuid())
+  budgetId    String
+  budget      BabyBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  description String
+  amount      Decimal    @db.Decimal(15, 2)
+  date        DateTime   @default(now())
+  receiptUrl  String?
+  vendorName  String?
+  createdAt   DateTime   @default(now())
+
+  @@map("baby_expenses")
+}
+
+model BabyMilestone {
+  id          String   @id @default(uuid())
+  babyPlanId  String
+  babyPlan    BabyPlan @relation(fields: [babyPlanId], references: [id], onDelete: Cascade)
+  phase       String   // pre_conception, trimester_1, trimester_2, trimester_3, birth, newborn, month_1_6, month_6_12, toddler
+  title       String
+  description String?
+  dueDate     DateTime?
+  achieved    Boolean  @default(false)
+  achievedAt  DateTime?
+  notes       String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("baby_milestones")
+}
+
+// ─────────────────────────────────────
+// WHATSAPP INTEGRATION (Phase 5)
+// ─────────────────────────────────────
+
+model WaConversation {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendorType  String?  // wedding, trip, baby
+  vendorId    String?  // polymorphic reference
+  weddingVendorId String?
+  weddingVendor   WeddingVendor? @relation(fields: [weddingVendorId], references: [id])
+  waPhone     String
+  summary     String?
+  lastMessageAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  messages    WaMessage[]
+
+  @@map("wa_conversations")
+}
+
+model WaMessage {
+  id              String         @id @default(uuid())
+  conversationId  String
+  conversation    WaConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction       String         // in, out
+  content         String
+  mediaUrl        String?
+  aiCategory      String?        // AI-categorized: quote, question, update, greeting, etc
+  aiExtractedData Json?          // AI-extracted: { price, package, date, contact }
+  processed       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+
+  @@map("wa_messages")
+}
+
+// ─────────────────────────────────────
+// NOTIFICATIONS & REMINDERS
+// ─────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // reminder, alert, summary, system
+  title     String
+  body      String
+  channel   String   @default("in_app") // in_app, email, wa, push
+  read      Boolean  @default(false)
+  readAt    DateTime?
+  actionUrl String?  // deep link
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model Reminder {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedEntityType String  // wedding_checklist, trip_checklist, baby_checklist, vendor, etc
+  relatedEntityId  String
+  message          String
+  remindAt         DateTime
+  channel          String   @default("in_app") // in_app, email, wa
+  sent             Boolean  @default(false)
+  sentAt           DateTime?
+  createdAt        DateTime @default(now())
+
+  @@map("reminders")
+}
+
+// ─────────────────────────────────────
+// AUDIT LOGS
+// ─────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // create, update, delete, login, logout, etc
+  entity    String   // wedding, trip, baby_plan, vendor, etc
+  entityId  String?
+  details   Json?    // { before, after, changes }
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}

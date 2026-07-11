@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: yola-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yola
+      POSTGRES_PASSWORD: yola_secret_2024
+      POSTGRES_DB: yola_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U yola -d yola_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (for caching & rate limiting)
+  redis:
+    image: redis:7-alpine
+    container_name: yola-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: yola-backend
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=postgresql://yola:yola_secret_2024@postgres:5432/yola_db
+      - JWT_SECRET=yola_jwt_secret_change_in_production
+      - JWT_REFRESH_SECRET=yola_refresh_secret_change_in_production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - FRONTEND_URL=http://localhost:3000
+      - REDIS_URL=redis://redis:6379
+      - TRIPAY_API_KEY=${TRIPAY_API_KEY:-}
+      - TRIPAY_MERCHANT_CODE=${TRIPAY_MERCHANT_CODE:-}
+      - TRIPAY_PRIVATE_KEY=${TRIPAY_PRIVATE_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma migrate deploy && node dist/index.js"
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: yola-frontend
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:4000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
