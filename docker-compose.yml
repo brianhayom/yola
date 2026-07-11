@@ -64,7 +64,7 @@ services:
       redis:
         condition: service_healthy
     command: >
-      sh -c "node node_modules/.bin/prisma db push --accept-data-loss 2>&1 || echo 'prisma push skipped' && node src/index.js"
+      sh -c "node node_modules/.bin/prisma db push --accept-data-loss 2>&1 || echo 'prisma push skipped' && npx tsx src/index.ts"
 
   # Frontend (Next.js)
   frontend:
