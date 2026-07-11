@@ -2,3 +2,7 @@
   base = "frontend"
   command = "npm run build"
   publish = "out"
+
+[build.environment]
+  NEXT_OUTPUT = "export"
+  NEXT_PUBLIC_API_URL = "http://51.79.150.44:4000/api"

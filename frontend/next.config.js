@@ -6,12 +6,14 @@ const withPWA = require('next-pwa')({
   disable: process.env.NODE_ENV === 'development',
 });
 
+const isStaticExport = process.env.NEXT_OUTPUT === 'export';
+
 const nextConfig = {
-  output: 'export',
+  ...(isStaticExport && { output: 'export' }),
   reactStrictMode: true,
   images: {
     domains: ['localhost', 'images.unsplash.com', 'source.unsplash.com'],
-    unoptimized: true,
+    ...(isStaticExport && { unoptimized: true }),
   },
 };
 
