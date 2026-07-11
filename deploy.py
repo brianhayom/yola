@@ -85,7 +85,10 @@ REDIS_URL=redis://redis:6379
     # Step 6: Check running containers
     run_command(client, "docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'", "Checking containers...")
 
-    # Step 7: Install Nginx if needed
+    # Step 7: Open firewall ports
+    run_command(client, "ufw allow 22 && ufw allow 80 && ufw allow 88 && ufw allow 3000 && ufw allow 4000 && ufw --force enable 2>&1 || echo 'ufw already enabled or not available'", "Opening firewall ports...")
+
+    # Step 8: Install Nginx if needed
     out, _ = run_command(client, "which nginx && nginx -v 2>&1 || echo 'nginx not found'", "Checking Nginx...")
     if "not found" in out.lower():
         run_command(client, "apt-get update -qq && apt-get install -y nginx 2>&1", "Installing Nginx...")
