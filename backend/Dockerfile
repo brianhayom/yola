@@ -17,6 +17,8 @@ COPY src ./src/
 # Production stage
 FROM node:20-alpine AS production
 
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 COPY --from=builder /app/package*.json ./
