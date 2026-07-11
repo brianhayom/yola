@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HiHome, HiHeart, HiGlobe, HiUser, HiSparkles } from 'react-icons/hi2';
+import { HiHome, HiHeart, HiGlobeAlt, HiUser, HiSparkles } from 'react-icons/hi2';
 
 const navItems = [
   { href: '/', label: 'Home', icon: HiHome },
   { href: '/wedding', label: 'Wedding', icon: HiHeart },
-  { href: '/trip', label: 'Trip', icon: HiGlobe },
+  { href: '/trip', label: 'Trip', icon: HiGlobeAlt },
   { href: '/baby', label: 'Baby', icon: HiSparkles },
   { href: '/profile', label: 'Profile', icon: HiUser },
 ];

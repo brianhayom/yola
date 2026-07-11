@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
-import { HiHeart, HiGlobe, HiSparkles, HiArrowRight, HiStar, HiShieldCheck, HiChatBubbleLeftRight } from 'react-icons/hi2';
+import { HiHeart, HiGlobeAlt, HiSparkles, HiArrowRight, HiStar, HiShieldCheck, HiChatBubbleLeftRight } from 'react-icons/hi2';
 
 export default function HomePage() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function HomePage() {
     {
       title: 'Trip Planner',
       description: 'Liburan sempurna dengan itinerary AI-powered',
-      icon: HiGlobe,
+      icon: HiGlobeAlt,
       href: '/trip',
       color: 'from-blue-500 to-cyan-600',
       bgLight: 'bg-blue-50',
