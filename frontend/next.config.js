@@ -7,17 +7,11 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
+  output: 'export',
   reactStrictMode: true,
   images: {
     domains: ['localhost', 'images.unsplash.com', 'source.unsplash.com'],
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL || 'http://localhost:4000'}/api/:path*`,
-      },
-    ];
+    unoptimized: true,
   },
 };
 
