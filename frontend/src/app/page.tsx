@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
-import { HiSparkles, HiHeart, HiGlobeAlt, HiChatBubbleLeftRight, HiArrowRight, HiShieldCheck, HiStar, HiCheck, HiChevronRight } from 'react-icons/hi2';
+import { HiSparkles, HiHeart, HiGlobeAlt, HiChatBubbleLeftRight, HiArrowRight, HiCheck, HiStar } from 'react-icons/hi2';
 import { useEffect, useRef, useState } from 'react';
 
 const features = [
@@ -10,35 +10,26 @@ const features = [
     icon: HiHeart,
     title: 'Wedding Planner',
     desc: 'Budget, vendor, checklist & timeline otomatis',
-    color: 'from-pink-500 to-rose-500',
-    bgLight: 'bg-pink-50',
-    textColor: 'text-pink-600',
-    gradient: 'from-pink-50 via-rose-50/30 to-transparent',
+    tags: ['AI Powered', 'Real-time', 'Mobile'],
   },
   {
     icon: HiGlobeAlt,
     title: 'Trip Planner',
     desc: 'Itinerary, budget tracker & rekomendasi AI',
-    color: 'from-blue-500 to-cyan-500',
-    bgLight: 'bg-blue-50',
-    textColor: 'text-blue-600',
-    gradient: 'from-blue-50 via-cyan-50/30 to-transparent',
+    tags: ['AI Powered', 'Real-time', 'Mobile'],
   },
   {
     icon: HiSparkles,
     title: 'Baby Planner',
     desc: 'Persiapan trimester, checklist & tips parenting',
-    color: 'from-purple-500 to-violet-500',
-    bgLight: 'bg-purple-50',
-    textColor: 'text-purple-600',
-    gradient: 'from-purple-50 via-violet-50/30 to-transparent',
+    tags: ['AI Powered', 'Real-time', 'Mobile'],
   },
 ];
 
 const stats = [
-  { value: '3', label: 'Life Modules', suffix: '' },
-  { value: 'AI', label: 'Powered', suffix: '' },
-  { value: '100', label: 'Gratis Mulai', suffix: '%' },
+  { value: '3', label: 'Life Modules' },
+  { value: 'AI', label: 'Powered' },
+  { value: '100%', label: 'Gratis Mulai' },
 ];
 
 const testimonials = [
@@ -93,15 +84,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ─── NAVBAR ─── */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
               <HiSparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent font-display">
-              YOLA
-            </span>
+            <span className="text-xl font-bold text-zinc-900">YOLA</span>
           </Link>
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
@@ -110,7 +99,7 @@ export default function HomePage() {
               </Link>
             ) : (
               <>
-                <Link href="/auth/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 px-4 py-2">
+                <Link href="/auth/login" className="text-sm font-medium text-zinc-600 hover:text-zinc-900 px-4 py-2 transition-colors">
                   Login
                 </Link>
                 <Link href="/auth/register" className="btn-primary text-sm px-5 py-2">
@@ -124,21 +113,19 @@ export default function HomePage() {
 
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden">
-        {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-primary-50/50 via-white to-white" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-primary-100/40 via-pink-50/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-primary-100/40 via-fuchsia-50/20 to-transparent rounded-full blur-3xl" />
         <div className="absolute top-20 right-0 w-72 h-72 bg-accent-100/30 rounded-full blur-3xl" />
         <div className="absolute top-40 left-0 w-72 h-72 bg-primary-100/30 rounded-full blur-3xl" />
 
         <div className="relative max-w-6xl mx-auto px-4 pt-20 pb-16 md:pt-28 md:pb-24">
           <div className="text-center max-w-3xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700 text-sm font-medium mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700 text-sm font-medium mb-6">
               <HiSparkles className="w-4 h-4" />
               <span>AI-Powered Life Assistant</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 font-display leading-[1.1] tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-extrabold text-zinc-900 leading-[1.1] tracking-tight">
               Rencanakan{' '}
               <span className="bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 bg-clip-text text-transparent">
                 Momen Terbaik
@@ -147,12 +134,11 @@ export default function HomePage() {
               Hidupmu dengan AI
             </h1>
 
-            <p className="mt-6 text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-6 text-lg md:text-xl text-zinc-500 max-w-2xl mx-auto leading-relaxed">
               YOLA bantu kamu rencanakan wedding, traveling, dan persiapan baby — 
               semua dengan bantuan AI cerdas yang siap 24/7.
             </p>
 
-            {/* CTA */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               {isLoggedIn ? (
                 <Link href="/dashboard" className="btn-primary px-8 py-4 text-lg inline-flex items-center gap-2 shadow-xl shadow-primary-500/20">
@@ -170,14 +156,13 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Stats */}
             <div className="mt-16 flex items-center justify-center gap-8 md:gap-16">
               {stats.map((s) => (
                 <div key={s.label} className="text-center">
                   <div className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
-                    {s.value}{s.suffix}
+                    {s.value}
                   </div>
-                  <div className="text-sm text-gray-400 mt-1 font-medium">{s.label}</div>
+                  <div className="text-sm text-zinc-400 mt-1 font-medium">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -189,10 +174,10 @@ export default function HomePage() {
       <section id="features" className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 font-display">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-zinc-900">
               Tiga Pilar Kehidupan
             </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-xl mx-auto">
+            <p className="mt-4 text-lg text-zinc-500 max-w-xl mx-auto">
               Semua tools yang kamu butuhkan untuk merencanakan momen spesial dalam hidup
             </p>
           </div>
@@ -203,32 +188,27 @@ export default function HomePage() {
               return (
                 <div
                   key={f.title}
-                  className={`group relative rounded-3xl p-8 transition-all duration-500 cursor-pointer
-                    ${i === activeFeature 
-                      ? 'bg-gradient-to-br from-white to-gray-50 shadow-2xl shadow-gray-200/50 scale-[1.02]' 
-                      : 'bg-white hover:shadow-xl hover:shadow-gray-100/50'
-                    }`}
+                  className={`group relative rounded-3xl p-8 transition-all duration-500 cursor-pointer border ${
+                    i === activeFeature 
+                      ? 'border-primary-200 bg-white shadow-xl shadow-primary-500/5 scale-[1.02]' 
+                      : 'border-zinc-100 bg-white hover:shadow-lg hover:border-zinc-200'
+                  }`}
                   onMouseEnter={() => setActiveFeature(i)}
                 >
-                  {/* Gradient background */}
-                  <div className={`absolute inset-0 rounded-3xl bg-gradient-to-b ${f.gradient} opacity-50 transition-opacity duration-500
-                    ${i === activeFeature ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`} />
+                  <div className={`w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center mb-5 transition-transform duration-300 ${
+                    i === activeFeature ? 'scale-110' : ''
+                  }`}>
+                    <Icon className="w-7 h-7 text-primary-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-zinc-900 mb-2">{f.title}</h3>
+                  <p className="text-zinc-500 leading-relaxed">{f.desc}</p>
                   
-                  <div className="relative">
-                    <div className={`w-16 h-16 rounded-2xl ${f.bgLight} flex items-center justify-center mb-6
-                      ${i === activeFeature ? 'scale-110' : ''} transition-transform duration-300`}>
-                      <Icon className={`w-8 h-8 ${f.textColor}`} />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 font-display mb-3">{f.title}</h3>
-                    <p className="text-gray-500 leading-relaxed">{f.desc}</p>
-                    
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {['AI Powered', 'Real-time', 'Mobile Friendly'].map((tag) => (
-                        <span key={tag} className={`px-3 py-1 rounded-full text-xs font-medium ${f.bgLight} ${f.textColor}`}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {f.tags.map((tag) => (
+                      <span key={tag} className="px-3 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-600">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
               );
@@ -238,7 +218,7 @@ export default function HomePage() {
       </section>
 
       {/* ─── AI ASSISTANT ─── */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-primary-900 via-primary-800 to-accent-900 relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-zinc-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
         
         <div className="relative max-w-6xl mx-auto px-4">
@@ -248,18 +228,18 @@ export default function HomePage() {
                 <HiChatBubbleLeftRight className="w-4 h-4" />
                 <span>AI Assistant 24/7</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white font-display leading-tight">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
                 Chat dengan AI
                 <br />
-                <span className="text-primary-200">Kapan Saja</span>
+                <span className="text-primary-300">Kapan Saja</span>
               </h2>
-              <p className="mt-6 text-lg text-primary-100/80 leading-relaxed max-w-md">
+              <p className="mt-6 text-lg text-zinc-400 leading-relaxed max-w-md">
                 Tanya apa saja ke AI YOLA — rekomendasi vendor, ide itinerary, tips parenting, 
                 atau sekadar curhat tentang planning hidupmu.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {['Rekomendasi Vendor', 'Itinerary AI', 'Tips Parenting', 'Budget Optimizer'].map((f) => (
-                  <span key={f} className="px-4 py-2 rounded-xl bg-white/10 text-white/80 text-sm font-medium backdrop-blur-sm">
+                  <span key={f} className="px-4 py-2 rounded-xl bg-white/10 text-zinc-300 text-sm font-medium">
                     {f}
                   </span>
                 ))}
@@ -283,8 +263,8 @@ export default function HomePage() {
                     <div key={i} className={`flex ${chat.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                         chat.role === 'user' 
-                          ? 'bg-primary-500 text-white rounded-br-md' 
-                          : 'bg-white/10 text-white/90 rounded-bl-md'
+                          ? 'bg-primary-600 text-white rounded-br-md' 
+                          : 'bg-white/10 text-zinc-300 rounded-bl-md'
                       }`}>
                         {chat.msg}
                       </div>
@@ -292,8 +272,8 @@ export default function HomePage() {
                   ))}
                 </div>
                 <div className="mt-4 flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">
-                  <div className="flex-1 text-sm text-white/40">Tanya AI tentang planningmu...</div>
-                  <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
+                  <div className="flex-1 text-sm text-zinc-500">Tanya AI tentang planningmu...</div>
+                  <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
                     <HiArrowRight className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -307,30 +287,30 @@ export default function HomePage() {
       <section className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 font-display">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-zinc-900">
               Dicintai Pengguna
             </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-xl mx-auto">
+            <p className="mt-4 text-lg text-zinc-500 max-w-xl mx-auto">
               Ribuan pengguna sudah merasakan kemudahan planning dengan YOLA
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <div key={t.name} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-100/50 transition-all duration-300">
+              <div key={t.name} className="bg-white rounded-3xl p-8 border border-zinc-100 shadow-sm hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center gap-1 mb-4">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <HiStar key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
+                <p className="text-zinc-600 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center text-white font-bold text-sm">
                     {t.name[0]}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">{t.name}</div>
-                    <div className="text-sm text-gray-400">{t.role}</div>
+                    <div className="font-semibold text-zinc-900">{t.name}</div>
+                    <div className="text-sm text-zinc-400">{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -340,13 +320,13 @@ export default function HomePage() {
       </section>
 
       {/* ─── PRICING ─── */}
-      <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 md:py-28 bg-zinc-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 font-display">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-zinc-900">
               Pilih Paketmu
             </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-xl mx-auto">
+            <p className="mt-4 text-lg text-zinc-500 max-w-xl mx-auto">
               Mulai gratis, upgrade kapan saja
             </p>
           </div>
@@ -358,7 +338,7 @@ export default function HomePage() {
                 className={`relative rounded-3xl p-8 transition-all duration-300 ${
                   plan.popular
                     ? 'bg-white shadow-2xl shadow-primary-500/10 border-2 border-primary-200 scale-105'
-                    : 'bg-white border border-gray-100 hover:shadow-xl'
+                    : 'bg-white border border-zinc-100 hover:shadow-lg'
                 }`}
               >
                 {plan.popular && (
@@ -367,15 +347,15 @@ export default function HomePage() {
                   </div>
                 )}
                 <div className="text-center">
-                  <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+                  <h3 className="text-xl font-bold text-zinc-900">{plan.name}</h3>
                   <div className="mt-4">
-                    <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-400 text-sm ml-1">{plan.period}</span>
+                    <span className="text-4xl font-extrabold text-zinc-900">{plan.price}</span>
+                    <span className="text-zinc-400 text-sm ml-1">{plan.period}</span>
                   </div>
                 </div>
                 <ul className="mt-8 space-y-4">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-gray-600">
+                    <li key={f} className="flex items-center gap-3 text-sm text-zinc-600">
                       <HiCheck className="w-5 h-5 text-primary-500 flex-shrink-0" />
                       <span>{f}</span>
                     </li>
@@ -386,7 +366,7 @@ export default function HomePage() {
                   className={`mt-8 block text-center py-3 rounded-xl font-semibold transition-all ${
                     plan.popular
                       ? 'btn-primary shadow-xl shadow-primary-500/20'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      : 'bg-zinc-50 text-zinc-700 hover:bg-zinc-100'
                   }`}
                 >
                   {plan.cta}
@@ -400,10 +380,10 @@ export default function HomePage() {
       {/* ─── CTA BOTTOM ─── */}
       <section className="py-20 md:py-28">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 font-display">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-zinc-900">
             Siap Rencanakan Hidupmu?
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-lg mx-auto">
+          <p className="mt-4 text-lg text-zinc-500 max-w-lg mx-auto">
             Gabung ribuan pengguna lain yang sudah merasakan kemudahan planning dengan YOLA
           </p>
           {!isLoggedIn && (
@@ -415,18 +395,18 @@ export default function HomePage() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="border-t border-gray-100 py-12">
+      <footer className="border-t border-zinc-100 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                 <HiSparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="text-lg font-bold text-gray-900 font-display">YOLA</span>
+              <span className="text-lg font-bold text-zinc-900">YOLA</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <Link href="#features" className="hover:text-gray-600 transition-colors">Fitur</Link>
-              <Link href="#pricing" className="hover:text-gray-600 transition-colors">Harga</Link>
+            <div className="flex items-center gap-6 text-sm text-zinc-400">
+              <Link href="#features" className="hover:text-zinc-600 transition-colors">Fitur</Link>
+              <Link href="#pricing" className="hover:text-zinc-600 transition-colors">Harga</Link>
               <span>Made with ❤️</span>
             </div>
           </div>
